@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <style>
 :root{--bg:#f2f6f3;--sf:#fff;--tx:#14231b;--mu:#5b6b62;--ac:#1f6f4a;--act:#fff;--bd:#d5e0d9;--bad:#c0332b;--ok:#1f6f4a;--soft:#e4efe8;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1713;--sf:#18231d;--tx:#e8f1ec;--mu:#9bb0a4;--ac:#4fc08a;--act:#07140d;--bd:#2a3a31;--bad:#ff7a70;--ok:#4fc08a;--soft:#1f3328;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0f1713;--sf:#18231d;--tx:#e8f1ec;--mu:#9bb0a4;--ac:#4fc08a;--act:#07140d;--bd:#2a3a31;--bad:#ff7a70;--ok:#4fc08a;--soft:#1f3328;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151515;--sf:#222;--tx:#ececec;--mu:#a2a2a2;--ac:#4fc08a;--act:#0d0d0d;--bd:#3a3a3a;--bad:#ff7a70;--ok:#4fc08a;--soft:#2e2e2e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151515;--sf:#222;--tx:#ececec;--mu:#a2a2a2;--ac:#4fc08a;--act:#0d0d0d;--bd:#3a3a3a;--bad:#ff7a70;--ok:#4fc08a;--soft:#2e2e2e;color-scheme:dark}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
@@ -95,6 +95,11 @@ header{flex-wrap:wrap}
 .cd.s,.cd.e{background:var(--ac);color:var(--act);font-weight:800;border-radius:50%;box-shadow:0 6px 14px rgba(0,0,0,.28)}
 .cs{margin-top:10px;text-align:center;color:var(--mu);font-size:13px}
 .fld{display:grid;gap:4px;margin-bottom:10px}
+.acc{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 16px;margin:0 0 10px;border:1px solid var(--bd);border-radius:14px;background:var(--sf);color:var(--tx);font:inherit;font-weight:800;cursor:pointer;text-align:left}
+.acc.on{border-color:var(--ac);background:var(--soft)}
+.acc .chv{color:var(--mu);font-size:22px;line-height:1;transition:transform .2s}
+.acc.on .chv{transform:rotate(90deg)}
+#sub-tampilan,#sub-bayar,#sub-struk{margin-bottom:10px}
 .kertas{margin:0 auto;background:#fff;color:#111;border:1px solid #d8d8d8;border-radius:6px;padding:14px;font-size:13px;line-height:1.4}
 .kertas .row{border-bottom:1px dashed #bbb;padding:5px 0}
 .kertas small{color:#555}
@@ -132,6 +137,7 @@ header{flex-wrap:wrap}
     </div>
     <div class="box" id="cartbox">
       <h2>Pesanan</h2>
+      <div class="fld"><label class="lbl" for="kpd">Kepada</label><input id="kpd" placeholder="Nama pembeli (opsional)" maxlength="40" autocomplete="off"></div>
       <div id="cart"></div>
       <div class="tot"><span>Total</span><span id="total">Rp0</span></div>
       <span class="lbl">Metode pembayaran</span><div class="quick" id="met"></div><div id="pinfo" class="hide"></div>
@@ -148,12 +154,7 @@ header{flex-wrap:wrap}
 </section>
 
 <section id="p4" class="hide">
-  <div class="tabs" id="sn" role="tablist" style="margin-bottom:14px">
-    <button class="on" data-sub="tampilan">Tampilan</button>
-    <button data-sub="bayar">Pembayaran</button>
-    <button data-sub="struk">Struk</button>
-  </div>
-
+  <button class="acc on" data-sub="tampilan" aria-expanded="true"><span>Tampilan</span><span class="chv">›</span></button>
   <div id="sub-tampilan">
     <div class="box">
       <h2>Tampilan</h2>
@@ -165,6 +166,7 @@ header{flex-wrap:wrap}
     </div>
   </div>
 
+  <button class="acc" data-sub="bayar" aria-expanded="false"><span>Pembayaran</span><span class="chv">›</span></button>
   <div id="sub-bayar" class="hide">
     <div class="box" style="margin-bottom:14px">
       <h2>QRIS</h2>
@@ -180,6 +182,7 @@ header{flex-wrap:wrap}
     </div>
   </div>
 
+  <button class="acc" data-sub="struk" aria-expanded="false"><span>Struk</span><span class="chv">›</span></button>
   <div id="sub-struk" class="hide">
     <div class="box" style="margin-bottom:14px">
       <h2>Edit struk</h2>
@@ -354,7 +357,7 @@ function renderHist(){
   $("#hm").innerHTML=Object.keys(pm).map(function(k){return '<div class="row"><span>'+esc(k)+'</span><b>'+rp(pm[k])+'</b></div>'}).join("");
   var tampil=sel.slice(0,200);
   $("#hlist").innerHTML=tampil.map(function(x){
-    return '<div class="row"><div class="n"><b>'+rp(x.t)+'</b> <small style="display:inline">('+esc(x.m||"Tunai")+')</small><small>'+new Date(x.w).toLocaleString("id-ID")+'</small><small>'+x.i.map(function(i){return esc(i.n)+' ×'+i.q}).join(", ")+'</small></div></div>';
+    return '<div class="row"><div class="n"><b>'+rp(x.t)+'</b> <small style="display:inline">('+esc(x.m||"Tunai")+')</small><small>'+new Date(x.w).toLocaleString("id-ID")+'</small>'+(x.k?'<small>Kepada: '+esc(x.k)+'</small>':'')+'<small>'+x.i.map(function(i){return esc(i.n)+' ×'+i.q}).join(", ")+'</small></div></div>';
   }).join("")+(sel.length>200?'<div class="empty">Menampilkan 200 transaksi terbaru dari '+sel.length+'.</div>':'')||'<div class="empty">Tidak ada transaksi pada rentang ini.</div>';
   $("#hhapus").className="btn bad"+(hArm?" arm":"");
   $("#hhapus").textContent=hArm?"Yakin hapus semua?":"Hapus semua riwayat";
@@ -378,7 +381,7 @@ function buildStruk(x,c){
   var tn=x.m==="Tunai",wd={"58":220,"80":300,"a4":380}[c.lebar]||300;
   var o='<div class="kertas" style="max-width:'+wd+'px">';
   if(c.logo)o+='<div style="text-align:center;margin-bottom:4px"><img src="'+document.querySelector(".brand img").src+'" alt="" width="52" height="52" style="border-radius:8px"></div>';
-  o+='<div style="text-align:center;margin-bottom:6px"><b>'+esc(c.nama)+'</b>'+(c.alamat?'<br><small>'+esc(c.alamat)+'</small>':'')+(c.telp?'<br><small>'+esc(c.telp)+'</small>':'')+'<br><small>'+new Date(x.w).toLocaleString("id-ID")+'</small></div>';
+  o+='<div style="text-align:center;margin-bottom:6px"><b>'+esc(c.nama)+'</b>'+(c.alamat?'<br><small>'+esc(c.alamat)+'</small>':'')+(c.telp?'<br><small>'+esc(c.telp)+'</small>':'')+'<br><small>'+new Date(x.w).toLocaleString("id-ID")+'</small>'+(x.k?'<br><small>Kepada: '+esc(x.k)+'</small>':'')+'</div>';
   o+=x.i.map(function(i){return '<div class="row"><span>'+esc(i.n)+' × '+i.q+'</span><span>'+rp(i.h*i.q)+'</span></div>'}).join("");
   o+='<div class="row"><b>Total</b><b>'+rp(x.t)+'</b></div><div class="row"><span>Metode</span><span>'+(tn?"Tunai":x.m==="QRIS"?"QRIS":"Transfer "+x.m)+'</span></div>';
   o+=tn?'<div class="row"><span>Bayar</span><span>'+rp(x.b)+'</span></div><div class="row"><b>Kembalian</b><b>'+rp(x.b-x.t)+'</b></div>':'<div class="row"><b>Status</b><b>Lunas</b></div>';
@@ -388,12 +391,13 @@ function buildStruk(x,c){
 function draft(){return {nama:$("#s_nama").value.trim()||"WM. Podo Roso Garang Asem",alamat:$("#s_alamat").value.trim(),telp:$("#s_telp").value.trim(),footer:$("#s_footer").value.trim(),logo:$("#s_logo").checked,lebar:lebarD}}
 function renderPrev(){
   $("#lb").innerHTML=[["58","58 mm"],["80","80 mm"],["a4","Biasa (A4)"]].map(function(r){return '<button class="btn'+(r[0]===lebarD?' pri':'')+'" data-lebar="'+r[0]+'">'+r[1]+'</button>'}).join("");
-  $("#prev").innerHTML=buildStruk({w:Date.now(),t:33000,b:50000,m:"Tunai",i:[{n:"Nasi putih",h:5000,q:2},{n:"Ayam goreng",h:15000,q:1},{n:"Es teh manis",h:4000,q:2}]},draft());
+  $("#prev").innerHTML=buildStruk({w:Date.now(),t:33000,b:50000,m:"Tunai",k:"Bapak Budi",i:[{n:"Nasi putih",h:5000,q:2},{n:"Ayam goreng",h:15000,q:1},{n:"Es teh manis",h:4000,q:2}]},draft());
 }
 function subTab(n){
-  ["tampilan","bayar","struk"].forEach(function(k){$("#sub-"+k).classList.toggle("hide",k!==n)});
-  document.querySelectorAll("#sn button").forEach(function(b){b.classList.toggle("on",b.dataset.sub===n)});
-  if(n==="struk")renderPrev();
+  var open=!$("#sub-"+n).classList.contains("hide");
+  ["tampilan","bayar","struk"].forEach(function(k){$("#sub-"+k).classList.toggle("hide",open||k!==n)});
+  document.querySelectorAll("#p4 .acc").forEach(function(b){var on=!open&&b.dataset.sub===n;b.classList.toggle("on",on);b.setAttribute("aria-expanded",on)});
+  if(!open&&n==="struk")renderPrev();
 }
 function renderSet(){
   $("#s_nama").value=S.nama;$("#s_alamat").value=S.alamat;$("#s_telp").value=S.telp;$("#s_footer").value=S.footer;$("#s_logo").checked=!!S.logo;lebarD=S.lebar;renderPrev();
@@ -414,7 +418,7 @@ $("#cari").oninput=renderMenu;
 $("#lihat").onclick=function(){$("#cartbox").scrollIntoView({behavior:"smooth"})};
 $("#bayar").oninput=function(){bayar=digits(this.value);this.value=bayar?rp(bayar):"";renderKem()};
 $("#hg").oninput=function(){var v=digits(this.value);this.value=v?v.toLocaleString("id-ID"):""};
-$("#kosong").onclick=function(){cart={};bayar=0;$("#bayar").value="";all()};
+$("#kosong").onclick=function(){cart={};bayar=0;$("#bayar").value="";$("#kpd").value="";all()};
 
 document.addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;var d=b.dataset;
@@ -449,13 +453,13 @@ $("#simpan").onclick=function(){
 };
 $("#selesai").onclick=function(){
   var t=total(),items=menu.filter(function(m){return cart[m.id]});
-  var now=new Date();var tn=metode==="Tunai";hist.unshift({w:now.getTime(),t:t,b:tn?bayar:t,m:metode,i:items.map(function(m){return {n:m.nama,h:m.harga,q:cart[m.id]}})});saveH();
+  var now=new Date();var tn=metode==="Tunai";hist.unshift({w:now.getTime(),t:t,b:tn?bayar:t,m:metode,k:$("#kpd").value.trim(),i:items.map(function(m){return {n:m.nama,h:m.harga,q:cart[m.id]}})});saveH();
   $("#struk").innerHTML=buildStruk(hist[0],S);
   $("#done").classList.remove("hide");
 };
 $("#cetak").onclick=function(){var st=document.getElementById("pg")||document.head.appendChild(Object.assign(document.createElement("style"),{id:"pg"}));st.textContent=S.lebar==="a4"?"@page{margin:12mm}":"@page{size:"+S.lebar+"mm auto;margin:3mm}";try{window.print()}catch(e){}};
 $("#hhapus").onclick=function(){if(!hArm){hArm=true;renderHist();return}hist=[];hArm=false;saveH();renderHist()};
-$("#tutup").onclick=function(){$("#done").classList.add("hide");cart={};bayar=0;metode="Tunai";$("#bayar").value="";all()};
+$("#tutup").onclick=function(){$("#done").classList.add("hide");cart={};bayar=0;metode="Tunai";$("#kpd").value="";$("#bayar").value="";all()};
 $("#s_qris").onchange=function(){var f=this.files[0];this.value="";if(!f)return;var r=new FileReader();r.onload=function(){var im=new Image();im.onload=function(){var sc=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement("canvas"),x;c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);S.qris=c.toDataURL("image/jpeg",.92);saveS();renderSet();refreshP()};im.src=r.result};r.readAsDataURL(f)};
 $("#qdel").onclick=function(){S.qris="";saveS();renderSet();refreshP()};
 $("#ssimpan").onclick=function(){BANKS.forEach(function(b,i){S.rek[b]={no:$("#rn"+i).value.trim(),an:$("#ra"+i).value.trim()}});saveS();refreshP();$("#sok").textContent="Rekening tersimpan.";setTimeout(function(){$("#sok").textContent=""},2500)};
@@ -466,7 +470,7 @@ function temaEff(){return tema!=="auto"?tema:(window.matchMedia&&matchMedia("(pr
 function temaTerap(){
   var r=document.documentElement,e=temaEff(),m=document.querySelector('meta[name="theme-color"]');
   if(tema==="auto")r.removeAttribute("data-theme");else r.setAttribute("data-theme",tema);
-  if(m)m.setAttribute("content",e==="dark"?"#0f1713":"#1f6f4a");
+  if(m)m.setAttribute("content",e==="dark"?"#151515":"#1f6f4a");
   var tb=$("#tema");tb.dataset.m=e==="dark"?"night":"day";tb.setAttribute("aria-checked",e==="dark");tb.title=e==="dark"?"Ganti ke mode siang":"Ganti ke mode malam";
   document.querySelectorAll("[data-tema]").forEach(function(b){b.className="btn"+(b.dataset.tema===tema?" pri":"")});
 }
